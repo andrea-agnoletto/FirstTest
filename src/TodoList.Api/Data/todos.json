@@ -1,0 +1,10 @@
+[
+  {
+    "id": "7f2a2362-54a7-4ed8-ba27-5d04a5e0587e",
+    "title": "Welcome to your TODO list",
+    "notes": "Create, complete, edit, and delete items. Your changes are saved in a JSON file.",
+    "isComplete": false,
+    "createdAt": "2026-11-17T12:00:00+00:00",
+    "dueDate": null
+  }
+]

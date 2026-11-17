@@ -1,0 +1,97 @@
+@page "/"
+@inject TodoApiClient Api
+
+<PageTitle>Today · TODO</PageTitle>
+
+@if (_isLoading)
+{
+    <p class="status">Loading your tasks…</p>
+}
+else
+{
+    <section class="hero">
+        <div><p class="eyebrow">MY TASKS</p><h1>Today</h1><p class="summary">@RemainingCount remaining · @_todos.Count total</p></div>
+        <button class="new-task" @onclick="OpenNew">+ New task</button>
+    </section>
+
+    @if (_error is not null) { <p class="error">@_error</p> }
+
+    <div class="filters" role="group" aria-label="Filter tasks">
+        @foreach (var filter in Enum.GetValues<Filter>())
+        {
+            <button class="@(_filter == filter ? "active" : "")" @onclick="() => _filter = filter">@filter</button>
+        }
+    </div>
+
+    @if (!VisibleTodos.Any())
+    {
+        <div class="empty"><div class="empty-icon">✓</div><h2>Nothing here</h2><p>Enjoy the clear space, or add your next task.</p></div>
+    }
+    else
+    {
+        <section class="task-list" aria-label="Tasks">
+            @foreach (var todo in VisibleTodos())
+            {
+                <article class="task @(todo.IsComplete ? "done" : "")">
+                    <input type="checkbox" checked="@todo.IsComplete" @onchange="async _ => await ToggleAsync(todo)" aria-label="Mark @todo.Title complete" />
+                    <div class="task-content" @onclick="() => OpenEdit(todo)">
+                        <h2>@todo.Title</h2>
+                        @if (!string.IsNullOrWhiteSpace(todo.Notes)) { <p>@todo.Notes</p> }
+                        @if (todo.DueDate is not null) { <small>Due @todo.DueDate.Value.LocalDateTime.ToString("MMM d")</small> }
+                    </div>
+                    <button class="delete" @onclick="async () => await DeleteAsync(todo)" aria-label="Delete @todo.Title">×</button>
+                </article>
+            }
+        </section>
+    }
+}
+
+@if (_editorOpen)
+{
+    <div class="overlay" @onclick="CloseEditor">
+        <section class="editor" @onclick:stopPropagation="true">
+            <div class="editor-heading"><h2>@(_editing is null ? "New task" : "Edit task")</h2><button @onclick="CloseEditor" aria-label="Close">×</button></div>
+            <EditForm Model="_input" OnValidSubmit="SaveAsync">
+                <DataAnnotationsValidator />
+                <label>Task <InputText @bind-Value="_input.Title" maxlength="120" required placeholder="What needs doing?" /></label>
+                <label>Notes <InputTextArea @bind-Value="_input.Notes" maxlength="1000" placeholder="Optional details" /></label>
+                <label>Due date <InputDate @bind-Value="_input.DueDate" /></label>
+                <div class="actions"><button type="button" class="secondary" @onclick="CloseEditor">Cancel</button><button type="submit" class="primary">Save task</button></div>
+            </EditForm>
+        </section>
+    </div>
+}
+
+@code {
+    private readonly List<TodoItem> _todos = [];
+    private TodoInput _input = new();
+    private TodoItem? _editing;
+    private Filter _filter = Filter.All;
+    private bool _isLoading = true, _editorOpen;
+    private string? _error;
+    private int RemainingCount => _todos.Count(x => !x.IsComplete);
+    private enum Filter { All, Open, Completed }
+    private IEnumerable<TodoItem> VisibleTodos() => _filter switch { Filter.Open => _todos.Where(x => !x.IsComplete), Filter.Completed => _todos.Where(x => x.IsComplete), _ => _todos };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { _todos.AddRange(await Api.GetTodosAsync()); }
+        catch { _error = "Could not reach the API. Start TodoList.Api and confirm the URL in wwwroot/appsettings.json."; }
+        finally { _isLoading = false; }
+    }
+    private void OpenNew() { _editing = null; _input = new(); _editorOpen = true; }
+    private void OpenEdit(TodoItem item) { _editing = item; _input = new() { Title = item.Title, Notes = item.Notes, DueDate = item.DueDate }; _editorOpen = true; }
+    private void CloseEditor() => _editorOpen = false;
+    private async Task SaveAsync()
+    {
+        try
+        {
+            if (_editing is null) _todos.Insert(0, await Api.CreateAsync(_input));
+            else { _editing.Title = _input.Title; _editing.Notes = _input.Notes; _editing.DueDate = _input.DueDate; await Api.UpdateAsync(_editing); }
+            CloseEditor();
+        }
+        catch { _error = "The task could not be saved. Please try again."; }
+    }
+    private async Task ToggleAsync(TodoItem item) { item.IsComplete = !item.IsComplete; try { await Api.UpdateAsync(item); } catch { item.IsComplete = !item.IsComplete; _error = "The task could not be updated."; } }
+    private async Task DeleteAsync(TodoItem item) { try { await Api.DeleteAsync(item.Id); _todos.Remove(item); } catch { _error = "The task could not be deleted."; } }
+}
