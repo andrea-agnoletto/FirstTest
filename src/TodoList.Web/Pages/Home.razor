@@ -23,7 +23,7 @@ else
         }
     </div>
 
-    @if (!VisibleTodos.Any())
+    @if (!VisibleTodos().Any())
     {
         <div class="empty"><div class="empty-icon">✓</div><h2>Nothing here</h2><p>Enjoy the clear space, or add your next task.</p></div>
     }

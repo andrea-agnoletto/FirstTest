@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "TODO API",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/src/TodoList.Api/TodoList.Api.csproj",
+            "launchProfile": "https"
+        },
+        {
+            "name": "TODO Web (Blazor)",
+            "type": "blazorwasm",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/src/TodoList.Web",
+            "url": "https://localhost:5002"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "TODO: Start API and Web",
+            "configurations": [
+                "TODO API",
+                "TODO Web (Blazor)"
+            ],
+            "stopAll": true
+        }
+    ]
+}

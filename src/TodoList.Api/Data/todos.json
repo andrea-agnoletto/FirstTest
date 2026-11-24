@@ -2,9 +2,17 @@
   {
     "id": "7f2a2362-54a7-4ed8-ba27-5d04a5e0587e",
     "title": "Welcome to your TODO list",
-    "notes": "Create, complete, edit, and delete items. Your changes are saved in a JSON file.",
+    "notes": "Create, complete, edit, and delete items. Your changes are saved in a JSON file mod.",
     "isComplete": false,
     "createdAt": "2026-11-17T12:00:00+00:00",
     "dueDate": null
+  },
+  {
+    "id": "55589aca-964f-4b5f-900d-266e40c6d6b2",
+    "title": "This is my second task for tomorrow",
+    "notes": "Test",
+    "isComplete": false,
+    "createdAt": "2026-11-17T14:03:51.201022+00:00",
+    "dueDate": "2026-11-18T00:00:00+01:00"
   }
 ]

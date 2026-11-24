@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TodoList.Api.Models;
 
-public sealed class CreateTodoRequest
+public class CreateTodoRequest
 {
     [Required, StringLength(120)]
     public string Title { get; set; } = string.Empty;

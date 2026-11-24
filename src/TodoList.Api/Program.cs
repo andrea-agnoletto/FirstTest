@@ -26,3 +26,5 @@ todos.MapDelete("/{id:guid}", async (Guid id, ITodoStore store, CancellationToke
     await store.DeleteAsync(id, ct) ? Results.NoContent() : Results.NotFound());
 
 app.Run();
+
+public partial class Program;
