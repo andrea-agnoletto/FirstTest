@@ -16,6 +16,9 @@ using TodoList.Api.Services;
 
 namespace TodoList.Tests;
 
+/// <summary>
+/// Tests the TODO HTTP endpoints using an in-memory test server and isolated JSON storage.
+/// </summary>
 [TestFixture]
 public class HttpEndPointTest
 {
@@ -23,6 +26,9 @@ public class HttpEndPointTest
     private WebApplicationFactory<Program> _factory = null!;
     private HttpClient _client = null!;
 
+    /// <summary>
+    /// Creates an isolated test server, store, and HTTP client.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -38,6 +44,9 @@ public class HttpEndPointTest
         _client = _factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
     }
 
+    /// <summary>
+    /// Disposes the test server and removes its temporary data directory.
+    /// </summary>
     [TearDown]
     public void TearDown()
     {
@@ -46,6 +55,9 @@ public class HttpEndPointTest
         Directory.Delete(_directory, recursive: true);
     }
 
+    /// <summary>
+    /// Verifies that the HTTP endpoints create, read, update, and delete an item.
+    /// </summary>
     [Test]
     public async Task CrudEndpointsCreateReadUpdateAndDeleteItem()
     {
@@ -82,6 +94,9 @@ public class HttpEndPointTest
         Assert.That(afterDelete.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
+    /// <summary>
+    /// Verifies that requests for a missing item return not found.
+    /// </summary>
     [Test]
     public async Task MissingItemReturnsNotFoundForGetPutAndDelete()
     {
@@ -97,6 +112,9 @@ public class HttpEndPointTest
         });
     }
 
+    /// <summary>
+    /// Verifies that invalid identifiers and malformed JSON requests are rejected.
+    /// </summary>
     [Test]
     public async Task InvalidIdentifiersAndMalformedJsonAreRejected()
     {
@@ -109,6 +127,9 @@ public class HttpEndPointTest
         });
     }
 
+    /// <summary>
+    /// Provides the minimal hosting environment required by the endpoint tests.
+    /// </summary>
     private sealed class TestEnvironment : IWebHostEnvironment
     {
         public string ApplicationName { get; set; } = "TodoList.Tests";

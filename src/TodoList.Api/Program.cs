@@ -33,4 +33,7 @@ todos.MapDelete("/{id:guid}", async (Guid id, ITodoStore store, CancellationToke
 
 app.Run();
 
+/// <summary>
+/// Exposes the generated entry point for integration testing.
+/// </summary>
 public partial class Program;
