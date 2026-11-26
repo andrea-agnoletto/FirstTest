@@ -10,12 +10,18 @@ using TodoList.Api.Services;
 
 namespace TodoList.Tests;
 
+/// <summary>
+/// Tests the JSON-backed TODO store.
+/// </summary>
 [TestFixture]
 public class ApiTest
 {
     private string _directory = null!;
     private JsonTodoStore _store = null!;
 
+    /// <summary>
+    /// Creates an isolated temporary directory and store for each test.
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
@@ -24,9 +30,15 @@ public class ApiTest
         _store = new JsonTodoStore(new TestEnvironment { ContentRootPath = _directory });
     }
 
+    /// <summary>
+    /// Removes the temporary directory created for the test.
+    /// </summary>
     [TearDown]
     public void TearDown() => Directory.Delete(_directory, recursive: true);
 
+    /// <summary>
+    /// Verifies that an empty store returns no items and cannot find an unrelated identifier.
+    /// </summary>
     [Test]
     public async Task EmptyStoreReturnsNoItems()
     {
@@ -34,6 +46,9 @@ public class ApiTest
         Assert.That(await _store.GetAsync(Guid.NewGuid(), CancellationToken.None), Is.Null);
     }
 
+    /// <summary>
+    /// Verifies that a created item is normalized and persists across store instances.
+    /// </summary>
     [Test]
     public async Task CreatePersistsNormalizedItemAcrossStoreInstances()
     {
@@ -52,6 +67,9 @@ public class ApiTest
         });
     }
 
+    /// <summary>
+    /// Verifies that updates persist while preserving the item's identity and creation time.
+    /// </summary>
     [Test]
     public async Task UpdatePersistsChangesAndPreservesIdentity()
     {
@@ -69,6 +87,9 @@ public class ApiTest
         });
     }
 
+    /// <summary>
+    /// Verifies deletion behavior and the results of operations on a missing item.
+    /// </summary>
     [Test]
     public async Task DeleteRemovesOnlyTheRequestedItemAndMissingOperationsReturnNotFound()
     {
@@ -80,6 +101,9 @@ public class ApiTest
         Assert.That((await _store.GetAllAsync(CancellationToken.None)).Select(x => x.Id), Is.EqualTo(new[] { second.Id }));
     }
 
+    /// <summary>
+    /// Verifies that open items are ordered by due date before completed items.
+    /// </summary>
     [Test]
     public async Task GetAllOrdersOpenTasksByDueDateBeforeCompletedTasks()
     {
@@ -90,6 +114,9 @@ public class ApiTest
         Assert.That((await _store.GetAllAsync(CancellationToken.None)).Select(x => x.Id), Is.EqualTo(new[] { earlier.Id, later.Id, completed.Id }));
     }
 
+    /// <summary>
+    /// Provides the minimal hosting environment required by the store tests.
+    /// </summary>
     private sealed class TestEnvironment : IWebHostEnvironment
     {
         public string ApplicationName { get; set; } = "TodoList.Tests";

@@ -2,6 +2,9 @@ using System;
 
 namespace TodoList.Web.Models;
 
+/// <summary>
+/// Represents a task returned by the TODO API.
+/// </summary>
 public sealed class TodoItem
 {
     public Guid Id { get; set; }
@@ -12,6 +15,9 @@ public sealed class TodoItem
     public DateTimeOffset? DueDate { get; set; }
 }
 
+/// <summary>
+/// Provides the values accepted when creating or editing a task.
+/// </summary>
 public sealed class TodoInput
 {
     public string Title { get; set; } = string.Empty;
